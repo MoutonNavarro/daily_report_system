@@ -24,7 +24,7 @@ public interface JpaConst {
     String EMP_COL_ADMIN_FLAG = "admin_flag"; //Admin rights
     String EMP_COL_CREATED_AT = "created_at"; //Date of created
     String EMP_COL_UPDATED_AT = "updated_at"; //Date of updated
-    String EMP_COL_DELETED_FLAG = "deleted_flag"; //Logical deleted flag
+    String EMP_COL_DELETE_FLAG = "deleted_flag"; //Logical deleted flag
 
     int ROLE_ADMIN = 1; //Admin rights on (Administrator)
     int ROLE_GENERAL = 0; //Admin rights off (General user)
