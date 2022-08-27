@@ -63,4 +63,18 @@ public class EmployeeAction extends ActionBase {
         forward(ForwardConst.FW_EMP_INDEX);
     }
 
+    /**
+     * Show new registration screen
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void entryNew() throws ServletException, IOException{
+
+        putRequestScope(AttributeConst.TOKEN, getTokenId()); //Token for anti-CSRF
+        putRequestScope(AttributeConst.EMPLOYEE, new EmployeeView()); //Empty employee instance
+
+        //Show new registration screen
+        forward(ForwardConst.FW_EMP_NEW);
+    }
+
 }
