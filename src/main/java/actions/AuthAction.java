@@ -97,4 +97,21 @@ public class AuthAction extends ActionBase {
         }
     }
 
+    /**
+     * Do processing logout
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void logout() throws ServletException, IOException{
+
+        //Remove parameter of logged in employee from session
+        removeSessionScope(AttributeConst.LOGIN_EMP);
+
+        //Add flush message about log out at session
+        putSessionScope(AttributeConst.FLUSH, MessageConst.I_LOGOUT.getMessage());
+
+        //Redirect to login screen
+        redirect(ForwardConst.ACT_AUTH, ForwardConst.CMD_SHOW_LOGIN);
+    }
+
 }
