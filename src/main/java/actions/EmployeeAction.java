@@ -41,28 +41,31 @@ public class EmployeeAction extends ActionBase {
      * @throws IOException
      */
     public void index() throws ServletException, IOException{
+        //Check administrator flag
+        if(checkAdmin()) {
+            //Acquire data for show list screen that pointed number of page
+            int page = getPage();
+            List<EmployeeView> employees = service.getPerPage(page);
 
-        //Acquire data for show list screen that pointed number of page
-        int page = getPage();
-        List<EmployeeView> employees = service.getPerPage(page);
+            //Acquire all number of employee data
+            long employeeCount = service.countAll();
 
-        //Acquire all number of employee data
-        long employeeCount = service.countAll();
+            putRequestScope(AttributeConst.EMPLOYEES, employees); //Acquired employee data
+            putRequestScope(AttributeConst.EMP_COUNT, employeeCount); //Number of all employee data
+            putRequestScope(AttributeConst.PAGE, page); //Number of page
+            putRequestScope(AttributeConst.MAX_ROW, JpaConst.ROW_PER_PAGE); //Number of record that showing at 1 page
 
-        putRequestScope(AttributeConst.EMPLOYEES, employees); //Acquired employee data
-        putRequestScope(AttributeConst.EMP_COUNT, employeeCount); //Number of all employee data
-        putRequestScope(AttributeConst.PAGE, page); //Number of page
-        putRequestScope(AttributeConst.MAX_ROW, JpaConst.ROW_PER_PAGE); //Number of record that showing at 1 page
+            //In case set flush message at session then move to request scope and remove from session
+            String flush = getSessionScope(AttributeConst.FLUSH);
+            if (flush != null) {
+                putRequestScope(AttributeConst.FLUSH, flush);
+                removeSessionScope(AttributeConst.FLUSH);
+            }
 
-        //In case set flush message at session then move to request scope and remove from session
-        String flush = getSessionScope(AttributeConst.FLUSH);
-        if (flush != null) {
-            putRequestScope(AttributeConst.FLUSH, flush);
-            removeSessionScope(AttributeConst.FLUSH);
+            //show list screen
+            forward(ForwardConst.FW_EMP_INDEX);
         }
 
-        //show list screen
-        forward(ForwardConst.FW_EMP_INDEX);
     }
 
     /**
@@ -72,11 +75,14 @@ public class EmployeeAction extends ActionBase {
      */
     public void entryNew() throws ServletException, IOException{
 
-        putRequestScope(AttributeConst.TOKEN, getTokenId()); //Token for anti-CSRF
-        putRequestScope(AttributeConst.EMPLOYEE, new EmployeeView()); //Empty employee instance
+        //Check administrator flag
+        if(checkAdmin()) {
+            putRequestScope(AttributeConst.TOKEN, getTokenId()); //Token for anti-CSRF
+            putRequestScope(AttributeConst.EMPLOYEE, new EmployeeView()); //Empty employee instance
 
-        //Show new registration screen
-        forward(ForwardConst.FW_EMP_NEW);
+            //Show new registration screen
+            forward(ForwardConst.FW_EMP_NEW);
+        }
     }
 
     /**
@@ -86,8 +92,8 @@ public class EmployeeAction extends ActionBase {
      */
     public void create() throws ServletException, IOException{
 
-        //Anti-CSRF token check
-        if (checkToken()) {
+        //Check administrator flag and check token for anti-CSRF
+        if(checkAdmin() && checkToken()) {
 
             //Create instance of employee information from parameter value
             EmployeeView ev = new EmployeeView(
@@ -135,20 +141,23 @@ public class EmployeeAction extends ActionBase {
      */
     public void show() throws ServletException, IOException{
 
-        //Acquire employee data with ID as a condition
-        EmployeeView ev = service.findOne(toNumber(getRequestParam(AttributeConst.EMP_ID)));
+        //Check administrator flag
+        if(checkAdmin()) {
+            //Acquire employee data with ID as a condition
+            EmployeeView ev = service.findOne(toNumber(getRequestParam(AttributeConst.EMP_ID)));
 
-        if (ev == null || ev.getDeleteFlag() == AttributeConst.DEL_FLAG_TRUE.getIntegerValue()) {
+            if (ev == null || ev.getDeleteFlag() == AttributeConst.DEL_FLAG_TRUE.getIntegerValue()) {
 
-            //In case failure to acquire a data or it has logical deleted then show error screen
-            forward(ForwardConst.FW_ERR_UNKNOWN);
-            return;
+                //In case failure to acquire a data or it has logical deleted then show error screen
+                forward(ForwardConst.FW_ERR_UNKNOWN);
+                return;
+            }
+
+            putRequestScope(AttributeConst.EMPLOYEE, ev); //Acquired employee information
+
+            //Show detail screen
+            forward(ForwardConst.FW_EMP_SHOW);
         }
-
-        putRequestScope(AttributeConst.EMPLOYEE, ev); //Acquired employee information
-
-        //Show detail screen
-        forward(ForwardConst.FW_EMP_SHOW);
     }
 
     /**
@@ -158,21 +167,24 @@ public class EmployeeAction extends ActionBase {
      */
     public void edit() throws ServletException, IOException{
 
-        //Acquire employee data with ID as a condition
-        EmployeeView ev = service.findOne(toNumber(getRequestParam(AttributeConst.EMP_ID)));
+        //Check administrator flag
+        if(checkAdmin()) {
+           //Acquire employee data with ID as a condition
+            EmployeeView ev = service.findOne(toNumber(getRequestParam(AttributeConst.EMP_ID)));
 
-        if (ev ==null || ev.getDeleteFlag() == AttributeConst.DEL_FLAG_TRUE.getIntegerValue()) {
+            if (ev ==null || ev.getDeleteFlag() == AttributeConst.DEL_FLAG_TRUE.getIntegerValue()) {
 
-            //In case failure to acquire the data or that has been logical deleted then show error screen.
-            forward(ForwardConst.FW_ERR_UNKNOWN);
-            return;
+                //In case failure to acquire the data or that has been logical deleted then show error screen.
+                forward(ForwardConst.FW_ERR_UNKNOWN);
+                return;
+            }
+
+            putRequestScope(AttributeConst.TOKEN, getTokenId()); //Token for anti-CSRF
+            putRequestScope(AttributeConst.EMPLOYEE, ev); //Acquired employee information
+
+            //Show edit screen
+            forward(ForwardConst.FW_EMP_EDIT);
         }
-
-        putRequestScope(AttributeConst.TOKEN, getTokenId()); //Token for anti-CSRF
-        putRequestScope(AttributeConst.EMPLOYEE, ev); //Acquired employee information
-
-        //Show edit screen
-        forward(ForwardConst.FW_EMP_EDIT);
     }
     /**
      * Do update
@@ -181,8 +193,8 @@ public class EmployeeAction extends ActionBase {
      */
     public void update() throws ServletException, IOException {
 
-        //Check anti-CSRF token
-        if (checkToken()) {
+        //Check administrator flag and check token for anti-CSRF
+        if(checkAdmin() && checkToken()) {
             //Create instance of employee information from value of parameter
             EmployeeView ev = new EmployeeView(
                     toNumber(getRequestParam(AttributeConst.EMP_ID)),
@@ -227,8 +239,8 @@ public class EmployeeAction extends ActionBase {
      * @throws IOException
      */
     public void destroy() throws ServletException, IOException{
-        //Anti-CSRF, check token
-        if (checkToken()) {
+        //Check administrator flag and check token for anti-CSRF
+        if(checkAdmin() && checkToken()) {
             //Logical delete employee data with ID as a condition
             service.destroy(toNumber(getRequestParam(AttributeConst.EMP_ID)));
 
@@ -237,6 +249,27 @@ public class EmployeeAction extends ActionBase {
 
             //Redirect to list screen
             redirect(ForwardConst.ACT_EMP, ForwardConst.CMD_INDEX);
+        }
+    }
+    /**
+     * Check logged in employee is administrator and when it is not administrator show error screen
+     * true: Administrator, false: not administrator
+     * @throws ServletException
+     * @throws IOException
+     */
+    private boolean checkAdmin() throws ServletException, IOException{
+
+        //Acquire logged in employee information from session
+        EmployeeView ev = (EmployeeView) getSessionScope(AttributeConst.LOGIN_EMP);
+
+        //If not administrator show error screen
+        if (ev.getAdminFlag() != AttributeConst.ROLE_ADMIN.getIntegerValue()) {
+
+            forward(ForwardConst.FW_ERR_UNKNOWN);
+            return false;
+
+        }else {
+            return true;
         }
     }
 
