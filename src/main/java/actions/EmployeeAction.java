@@ -151,4 +151,28 @@ public class EmployeeAction extends ActionBase {
         forward(ForwardConst.FW_EMP_SHOW);
     }
 
+    /**
+     * Show edit screen
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void edit() throws ServletException, IOException{
+
+        //Acquire employee data with ID as a condition
+        EmployeeView ev = service.findOne(toNumber(getRequestParam(AttributeConst.EMP_ID)));
+
+        if (ev ==null || ev.getDeleteFlag() == AttributeConst.DEL_FLAG_TRUE.getIntegerValue()) {
+
+            //In case failure to acquire the data or that has been logical deleted then show error screen.
+            forward(ForwardConst.FW_ERR_UNKNOWN);
+            return;
+        }
+
+        putRequestScope(AttributeConst.TOKEN, getTokenId()); //Token for anti-CSRF
+        putRequestScope(AttributeConst.EMPLOYEE, ev); //Acquired employee information
+
+        //Show edit screen
+        forward(ForwardConst.FW_EMP_EDIT);
+    }
+
 }
