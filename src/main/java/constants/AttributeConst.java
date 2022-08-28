@@ -26,7 +26,7 @@ public enum AttributeConst {
     EMP_CODE("code"),
     EMP_PASS("password"),
     EMP_NAME("name"),
-    EMP_ADMIN_FLAG("admin_flag"),
+    EMP_ADMIN_FLG("admin_flag"),
 
     //Administrator flag
     ROLE_ADMIN(1),

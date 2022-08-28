@@ -9,6 +9,8 @@ import actions.views.EmployeeView;
 import constants.AttributeConst;
 import constants.ForwardConst;
 import constants.JpaConst;
+import constants.MessageConst;
+import constants.PropertyConst;
 import services.EmployeeService;
 
 /**
@@ -75,6 +77,55 @@ public class EmployeeAction extends ActionBase {
 
         //Show new registration screen
         forward(ForwardConst.FW_EMP_NEW);
+    }
+
+    /**
+     * Do new registration
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void create() throws ServletException, IOException{
+
+        //Anti-CSRF token check
+        if (checkToken()) {
+
+            //Create instance of employee information from parameter value
+            EmployeeView ev = new EmployeeView(
+                    null,
+                    getRequestParam(AttributeConst.EMP_CODE),
+                    getRequestParam(AttributeConst.EMP_NAME),
+                    getRequestParam(AttributeConst.EMP_PASS),
+                    toNumber(getRequestParam(AttributeConst.EMP_ADMIN_FLG)),
+                    null,
+                    null,
+                    AttributeConst.DEL_FLAG_FALSE.getIntegerValue());
+
+            //Acquire pepper character string from application scope
+            String pepper = getContextScope(PropertyConst.PEPPER);
+
+            //Employee information
+            List<String> errors = service.create(ev, pepper);
+
+            if (errors.size() > 0) {
+                //In case error happened
+
+                putRequestScope(AttributeConst.TOKEN, getTokenId()); //The token for anti-CSRF
+                putRequestScope(AttributeConst.EMPLOYEE, ev); //Inputed employee information
+                putRequestScope(AttributeConst.ERR, errors); //List of errors
+
+                //Re-show new registration screen
+                forward(ForwardConst.FW_EMP_NEW);
+
+            }else {
+                //In case no errors until registering
+
+                //Set flush message about register complete at the session
+                putSessionScope(AttributeConst.FLUSH, MessageConst.I_REGISTERD.getMessage());
+
+                //Redirect to list screen
+                redirect(ForwardConst.ACT_EMP, ForwardConst.CMD_INDEX);
+            }
+        }
     }
 
 }

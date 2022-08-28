@@ -26,8 +26,8 @@
 <input type="password" name="${AttributeConst.EMP_PASS.getValue()}" id="${AttributeConst.EMP_PASS.getValue()}" />
 <br /><br />
 
-<label for="${AttributeConst.EMP_ADMIN_FLAG.getValue()}">Rights</label><br />
-<select name="${AttributeConst.EMP_ADMIN_FLAG.getValue()}" id="${AttributeConst.EMP_ADMIN_FLAG.getValue()}">
+<label for="${AttributeConst.EMP_ADMIN_FLG.getValue()}">Rights</label><br />
+<select name="${AttributeConst.EMP_ADMIN_FLG.getValue()}" id="${AttributeConst.EMP_ADMIN_FLG.getValue()}">
     <option value="${AttributeConst.ROLE_GENERAL.getIntegerValue()}"<c:if test="${employee.adminFlag == AttributeConst.ROLE_GENERAL.getIntegerValue()}"> selected</c:if>>General</option>
     <option value="${AttributeConst.ROLE_ADMIN.getIntegerValue()}"<c:if test="${employee.adminFlag == AttributeConst.ROLE_ADMIN.getIntegerValue()}"> selected</c:if>>Administrator</option>
 </select>
