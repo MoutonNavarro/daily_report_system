@@ -174,5 +174,51 @@ public class EmployeeAction extends ActionBase {
         //Show edit screen
         forward(ForwardConst.FW_EMP_EDIT);
     }
+    /**
+     * Do update
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void update() throws ServletException, IOException {
+
+        //Check anti-CSRF token
+        if (checkToken()) {
+            //Create instance of employee information from value of parameter
+            EmployeeView ev = new EmployeeView(
+                    toNumber(getRequestParam(AttributeConst.EMP_ID)),
+                    getRequestParam(AttributeConst.EMP_CODE),
+                    getRequestParam(AttributeConst.EMP_NAME),
+                    getRequestParam(AttributeConst.EMP_PASS),
+                    toNumber(getRequestParam(AttributeConst.EMP_ADMIN_FLG)),
+                    null,
+                    null,
+                    AttributeConst.DEL_FLAG_FALSE.getIntegerValue());
+
+            //Acquire pepper character string from application scope
+            String pepper = getContextScope(PropertyConst.PEPPER);
+
+            //Update employee information
+            List<String> errors = service.update(ev,  pepper);
+
+            if (errors.size() > 0) {
+                //Errors happened until updating
+
+                putRequestScope(AttributeConst.TOKEN, getTokenId()); //Token for anti-CSRF
+                putRequestScope(AttributeConst.EMPLOYEE, ev); //Inputed employee information
+                putRequestScope(AttributeConst.ERR, errors); //List of errors
+
+                //Re-show edit screen
+                forward(ForwardConst.FW_EMP_EDIT);
+            }else {
+                //In case no errors happened until updating
+
+                //Set flush message about update complete at session
+                putSessionScope(AttributeConst.FLUSH, MessageConst.I_UPDATED.getMessage());
+
+                //Redirect to list screen
+                redirect(ForwardConst.ACT_EMP, ForwardConst.CMD_INDEX);
+            }
+        }
+    }
 
 }
