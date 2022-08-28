@@ -128,4 +128,27 @@ public class EmployeeAction extends ActionBase {
         }
     }
 
+    /**
+     * Show detail screen
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void show() throws ServletException, IOException{
+
+        //Acquire employee data with ID as a condition
+        EmployeeView ev = service.findOne(toNumber(getRequestParam(AttributeConst.EMP_ID)));
+
+        if (ev == null || ev.getDeleteFlag() == AttributeConst.DEL_FLAG_TRUE.getIntegerValue()) {
+
+            //In case failure to acquire a data or it has logical deleted then show error screen
+            forward(ForwardConst.FW_ERR_UNKNOWN);
+            return;
+        }
+
+        putRequestScope(AttributeConst.EMPLOYEE, ev); //Acquired employee information
+
+        //Show detail screen
+        forward(ForwardConst.FW_EMP_SHOW);
+    }
+
 }

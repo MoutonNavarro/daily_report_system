@@ -47,11 +47,11 @@ public class EmployeeService extends ServiceBase {
      * @param pepper pepper character string
      * @return Acquired instance. In case failure to acquired then null
      */
-    public EmployeeView fineOne(String code, String plainPass, String pepper) {
+    public EmployeeView findOne(String code, String plainPass, String pepper) {
         Employee e = null;
         try {
             //Hash password
-            String pass = EnctyptUtil.getPasswordEncrypt(plainPass, pepper);
+            String pass = EncryptUtil.getPasswordEncrypt(plainPass, pepper);
 
             //Get 1 undeleted employee based on employee number and hashed password
             e = em.createNamedQuery(JpaConst.Q_EMP_GET_BY_CODE_AND_PASS, Employee.class)
@@ -64,6 +64,17 @@ public class EmployeeService extends ServiceBase {
 
         return EmployeeConverter.toView(e);
     }
+
+    /**
+     * Return acquired data with ID as a condition with EmployeeView instance
+     * @param id
+     * @return Instance of acquired data
+     */
+    public EmployeeView findOne(int id) {
+        Employee e = findOneInternal(id);
+        return EmployeeConverter.toView(e);
+    }
+
     /**
      * Acquire the number of data corresponding to the employee number and return it
      * @param code employee number
