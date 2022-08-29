@@ -67,9 +67,12 @@ public interface JpaConst {
     //Get all reports with reverse order with its ID
     String Q_REP_GET_ALL = ENTITY_REP + ".getAll";
     String Q_REP_GET_ALL_DEF = "SELECT r FROM Report AS r ORDER BY r.id DESC";
+    //Acquire all number of daily report
+    String Q_REP_COUNT = ENTITY_REP + ".count";
+    String Q_REP_COUNT_DEF = "SELECT COUNT(r) FROM Report AS r";
     //Get report that pointed employee's created with reverse order with all ID
     String Q_REP_GET_ALL_MINE = ENTITY_REP + ".getAllMine";
-    String Q_REP_GET_ALL_MINE_DEF = "SELECT r FROM Reoirt AS r WHERE r.employee = :" + JPQL_PARM_EMPLOYEE + " ORDER BY r.id DESC";
+    String Q_REP_GET_ALL_MINE_DEF = "SELECT r FROM Report AS r WHERE r.employee = :" + JPQL_PARM_EMPLOYEE + " ORDER BY r.id DESC";
     //Get number of reports that pointed employee's created
     String Q_REP_COUNT_ALL_MINE = ENTITY_REP + "countAllMine";
     String Q_REP_COUNT_ALL_MINE_DEF = "SELECT COUNT(r) FROM Report AS r WHERE r.employee = :" + JPQL_PARM_EMPLOYEE;

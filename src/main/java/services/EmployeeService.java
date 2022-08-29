@@ -54,7 +54,7 @@ public class EmployeeService extends ServiceBase {
             String pass = EncryptUtil.getPasswordEncrypt(plainPass, pepper);
 
             //Get 1 undeleted employee based on employee number and hashed password
-            e = em.createNamedQuery(JpaConst.Q_EMP_GET_BY_CODE_AND_PASS, Employee.class)
+            e = em.createNamedQuery(JpaConst.Q_EMP_GET_BY_CODE_AND_PASS, Employee.class)    //SELECT e FROM Employee AS e WHERE e.deleteFlag = 0 AND e.code = :" + code + " AND e.password = :" + pass;
                     .setParameter(JpaConst.JPQL_PARM_CODE, code)
                     .setParameter(JpaConst.JPQL_PARM_PASSWORD, pass)
                     .getSingleResult();
