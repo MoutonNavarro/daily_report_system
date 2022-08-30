@@ -10,7 +10,7 @@
 
 <c:import url="/WEB-INF/views/layout/app.jsp">
     <c:param name="content">
-        <H2>ID: ${employee.id}'s employee information editl page</H2>
+        <H2>ID: ${employee.id}'s employee information edit page</H2>
 
         <p>(Enter the password only if you want to change it)</p>
         <form method="POST"

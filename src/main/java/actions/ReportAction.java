@@ -162,33 +162,35 @@ public class ReportAction extends ActionBase {
             forward(ForwardConst.FW_REP_SHOW);
         }
     }
-//
-//    /**
-//     * Show edit screen
-//     * @throws ServletException
-//     * @throws IOException
-//     */
-//    public void edit() throws ServletException, IOException{
-//
-//        //Check administrator flag
-//        if(checkAdmin()) {
-//           //Acquire employee data with ID as a condition
-//            EmployeeView ev = service.findOne(toNumber(getRequestParam(AttributeConst.EMP_ID)));
-//
-//            if (ev ==null || ev.getDeleteFlag() == AttributeConst.DEL_FLAG_TRUE.getIntegerValue()) {
-//
-//                //In case failure to acquire the data or that has been logical deleted then show error screen.
-//                forward(ForwardConst.FW_ERR_UNKNOWN);
-//                return;
-//            }
-//
-//            putRequestScope(AttributeConst.TOKEN, getTokenId()); //Token for anti-CSRF
-//            putRequestScope(AttributeConst.EMPLOYEE, ev); //Acquired employee information
-//
-//            //Show edit screen
-//            forward(ForwardConst.FW_EMP_EDIT);
-//        }
-//    }
+
+    /**
+     * Show edit screen
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void edit() throws ServletException, IOException{
+
+       //Acquire report data with ID as a condition
+        ReportView rv = service.findOne(toNumber(getRequestParam(AttributeConst.REP_ID)));
+
+        //Acquire logging in employee information from session
+        EmployeeView ev = (EmployeeView) getSessionScope(AttributeConst.LOGIN_EMP);
+
+        if (rv ==null || ev.getId() != rv.getEmployee().getId()) {
+
+            //In case pointed report hasn't exist or
+            //logging in employee is not match to who is created the report then show error screen
+            forward(ForwardConst.FW_ERR_UNKNOWN);
+            return;
+        }else {
+            putRequestScope(AttributeConst.TOKEN, getTokenId()); //Token for anti-CSRF
+            putRequestScope(AttributeConst.REPORT, rv); //Acquired report information
+
+            //Show edit screen
+            forward(ForwardConst.FW_REP_EDIT);
+        }
+
+    }
 //    /**
 //     * Do update
 //     * @throws ServletException
