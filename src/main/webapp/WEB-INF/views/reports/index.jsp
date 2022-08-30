@@ -38,7 +38,7 @@
         </table>
 
         <div id="pagination">
-            (All ${employees_count} items)<br />
+            (All ${reports_count} items)<br />
             <c:forEach var="i" begin="1" end="${((employees_count - 1) / maxRow) + 1 }" step="1">
                 <c:choose>
                     <c:when test="${i == page}">
