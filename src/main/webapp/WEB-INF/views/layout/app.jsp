@@ -12,7 +12,7 @@
 <c:set var="commOut" value="${ForwardConst.CMD_LOGOUT.getValue()}" />
 
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <title>Daily report management system</title>
