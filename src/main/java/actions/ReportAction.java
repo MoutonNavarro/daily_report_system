@@ -191,91 +191,46 @@ public class ReportAction extends ActionBase {
         }
 
     }
-//    /**
-//     * Do update
-//     * @throws ServletException
-//     * @throws IOException
-//     */
-//    public void update() throws ServletException, IOException {
-//
-//        //Check administrator flag and check token for anti-CSRF
-//        if(checkAdmin() && checkToken()) {
-//            //Create instance of employee information from value of parameter
-//            EmployeeView ev = new EmployeeView(
-//                    toNumber(getRequestParam(AttributeConst.EMP_ID)),
-//                    getRequestParam(AttributeConst.EMP_CODE),
-//                    getRequestParam(AttributeConst.EMP_NAME),
-//                    getRequestParam(AttributeConst.EMP_PASS),
-//                    toNumber(getRequestParam(AttributeConst.EMP_ADMIN_FLG)),
-//                    null,
-//                    null,
-//                    AttributeConst.DEL_FLAG_FALSE.getIntegerValue());
-//
-//            //Acquire pepper character string from application scope
-//            String pepper = getContextScope(PropertyConst.PEPPER);
-//
-//            //Update employee information
-//            List<String> errors = service.update(ev,  pepper);
-//
-//            if (errors.size() > 0) {
-//                //Errors happened until updating
-//
-//                putRequestScope(AttributeConst.TOKEN, getTokenId()); //Token for anti-CSRF
-//                putRequestScope(AttributeConst.EMPLOYEE, ev); //Inputed employee information
-//                putRequestScope(AttributeConst.ERR, errors); //List of errors
-//
-//                //Re-show edit screen
-//                forward(ForwardConst.FW_EMP_EDIT);
-//            }else {
-//                //In case no errors happened until updating
-//
-//                //Set flush message about update complete at session
-//                putSessionScope(AttributeConst.FLUSH, MessageConst.I_UPDATED.getMessage());
-//
-//                //Redirect to list screen
-//                redirect(ForwardConst.ACT_EMP, ForwardConst.CMD_INDEX);
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Do logical delete
-//     * @throws ServletException
-//     * @throws IOException
-//     */
-//    public void destroy() throws ServletException, IOException{
-//        //Check administrator flag and check token for anti-CSRF
-//        if(checkAdmin() && checkToken()) {
-//            //Logical delete employee data with ID as a condition
-//            service.destroy(toNumber(getRequestParam(AttributeConst.EMP_ID)));
-//
-//            //Set flush message about delete complete at session
-//            putSessionScope(AttributeConst.FLUSH, MessageConst.I_DELETED.getMessage());
-//
-//            //Redirect to list screen
-//            redirect(ForwardConst.ACT_EMP, ForwardConst.CMD_INDEX);
-//        }
-//    }
-//    /**
-//     * Check logged in employee is administrator and when it is not administrator show error screen
-//     * true: Administrator, false: not administrator
-//     * @throws ServletException
-//     * @throws IOException
-//     */
-//    private boolean checkAdmin() throws ServletException, IOException{
-//
-//        //Acquire logged in employee information from session
-//        EmployeeView ev = (EmployeeView) getSessionScope(AttributeConst.LOGIN_EMP);
-//
-//        //If not administrator show error screen
-//        if (ev.getAdminFlag() != AttributeConst.ROLE_ADMIN.getIntegerValue()) {
-//
-//            forward(ForwardConst.FW_ERR_UNKNOWN);
-//            return false;
-//
-//        }else {
-//            return true;
-//        }
-//    }
+    /**
+     * Do update
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void update() throws ServletException, IOException {
+
+        //Anti-CSRF, check the token
+        if(checkToken()) {
+
+            //Acquire daily report data with ID as a condition
+            ReportView rv = service.findOne(toNumber(getRequestParam(AttributeConst.REP_ID)));
+
+            //Set input the report content
+            rv.setReportDate(toLocalDate(getRequestParam(AttributeConst.REP_DATE)));
+            rv.setTitle(getRequestParam(AttributeConst.REP_TITLE));
+            rv.setContent(getRequestParam(AttributeConst.REP_CONTENT));
+
+            //Update the report data
+            List<String> errors = service.update(rv);
+
+            if (errors.size() > 0) {
+                //Errors happened until updating
+
+                putRequestScope(AttributeConst.TOKEN, getTokenId()); //Token for anti-CSRF
+                putRequestScope(AttributeConst.REPORT, rv); //Input the report information
+                putRequestScope(AttributeConst.ERR, errors); //List of errors
+
+                //Re-show edit screen
+                forward(ForwardConst.FW_REP_EDIT);
+            }else {
+                //In case no errors happened until updating
+
+                //Set flush message about update complete at session
+                putSessionScope(AttributeConst.FLUSH, MessageConst.I_UPDATED.getMessage());
+
+                //Redirect to list screen
+                redirect(ForwardConst.ACT_REP, ForwardConst.CMD_INDEX);
+            }
+        }
+    }
 
 }
