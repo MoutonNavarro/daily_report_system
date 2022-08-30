@@ -140,31 +140,28 @@ public class ReportAction extends ActionBase {
         }
     }
 
-//    /**
-//     * Show detail screen
-//     * @throws ServletException
-//     * @throws IOException
-//     */
-//    public void show() throws ServletException, IOException{
-//
-//        //Check administrator flag
-//        if(checkAdmin()) {
-//            //Acquire employee data with ID as a condition
-//            EmployeeView ev = service.findOne(toNumber(getRequestParam(AttributeConst.EMP_ID)));
-//
-//            if (ev == null || ev.getDeleteFlag() == AttributeConst.DEL_FLAG_TRUE.getIntegerValue()) {
-//
-//                //In case failure to acquire a data or it has logical deleted then show error screen
-//                forward(ForwardConst.FW_ERR_UNKNOWN);
-//                return;
-//            }
-//
-//            putRequestScope(AttributeConst.EMPLOYEE, ev); //Acquired employee information
-//
-//            //Show detail screen
-//            forward(ForwardConst.FW_EMP_SHOW);
-//        }
-//    }
+    /**
+     * Show detail screen
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void show() throws ServletException, IOException{
+
+        //Acquire report data with ID as a condition
+        ReportView rv = service.findOne(toNumber(getRequestParam(AttributeConst.REP_ID)));
+
+        if (rv == null) {
+
+            //In case pointed report data is not exist then show error screen
+            forward(ForwardConst.FW_ERR_UNKNOWN);
+            return;
+        }else {
+            putRequestScope(AttributeConst.REPORT, rv); //Acquired daily report data
+
+            //Show detail screen
+            forward(ForwardConst.FW_REP_SHOW);
+        }
+    }
 //
 //    /**
 //     * Show edit screen
