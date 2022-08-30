@@ -6,10 +6,12 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 
+import actions.views.EmployeeView;
 import actions.views.ReportView;
 import constants.AttributeConst;
 import constants.ForwardConst;
 import constants.JpaConst;
+import constants.MessageConst;
 import services.ReportService;
 
 /**
@@ -81,56 +83,63 @@ public class ReportAction extends ActionBase {
         //Show new registration screen
         forward(ForwardConst.FW_REP_NEW);
     }
-//
-//    /**
-//     * Do new registration
-//     * @throws ServletException
-//     * @throws IOException
-//     */
-//    public void create() throws ServletException, IOException{
-//
-//        //Check administrator flag and check token for anti-CSRF
-//        if(checkAdmin() && checkToken()) {
-//
-//            //Create instance of employee information from parameter value
-//            EmployeeView ev = new EmployeeView(
-//                    null,
-//                    getRequestParam(AttributeConst.EMP_CODE),
-//                    getRequestParam(AttributeConst.EMP_NAME),
-//                    getRequestParam(AttributeConst.EMP_PASS),
-//                    toNumber(getRequestParam(AttributeConst.EMP_ADMIN_FLG)),
-//                    null,
-//                    null,
-//                    AttributeConst.DEL_FLAG_FALSE.getIntegerValue());
-//
-//            //Acquire pepper character string from application scope
-//            String pepper = getContextScope(PropertyConst.PEPPER);
-//
-//            //Employee information
-//            List<String> errors = service.create(ev, pepper);
-//
-//            if (errors.size() > 0) {
-//                //In case error happened
-//
-//                putRequestScope(AttributeConst.TOKEN, getTokenId()); //The token for anti-CSRF
-//                putRequestScope(AttributeConst.EMPLOYEE, ev); //Inputed employee information
-//                putRequestScope(AttributeConst.ERR, errors); //List of errors
-//
-//                //Re-show new registration screen
-//                forward(ForwardConst.FW_EMP_NEW);
-//
-//            }else {
-//                //In case no errors until registering
-//
-//                //Set flush message about register complete at the session
-//                putSessionScope(AttributeConst.FLUSH, MessageConst.I_REGISTERD.getMessage());
-//
-//                //Redirect to list screen
-//                redirect(ForwardConst.ACT_EMP, ForwardConst.CMD_INDEX);
-//            }
-//        }
-//    }
-//
+
+    /**
+     * Do new registration
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void create() throws ServletException, IOException{
+
+        //Anti-CSRF check token
+        if(checkToken()) {
+
+            //In case it hasn't input date then set today's date
+            LocalDate day = null;
+            if (getRequestParam(AttributeConst.REP_DATE) == null
+                    || getRequestParam(AttributeConst.REP_DATE).equals("")) {
+                day = LocalDate.now();
+            }else {
+                day = LocalDate.parse(getRequestParam(AttributeConst.REP_DATE));
+            }
+            //Acquire logging in employee information from session
+            EmployeeView ev = (EmployeeView) getSessionScope(AttributeConst.LOGIN_EMP);
+
+            //Create instance of report information from value of the parameter
+            ReportView rv = new ReportView(
+                    null,
+                    ev,//Register logging in employee as who create the report
+                    day,
+                    getRequestParam(AttributeConst.REP_TITLE),
+                    getRequestParam(AttributeConst.REP_CONTENT),
+                    null,
+                    null);
+
+            //Register daily report information
+            List<String> errors = service.create(rv);
+
+            if (errors.size() > 0) {
+                //In case error happened
+
+                putRequestScope(AttributeConst.TOKEN, getTokenId()); //The token for anti-CSRF
+                putRequestScope(AttributeConst.REPORT, rv); //Inputed daily report information
+                putRequestScope(AttributeConst.ERR, errors); //List of errors
+
+                //Re-show new registration screen
+                forward(ForwardConst.FW_EMP_NEW);
+
+            }else {
+                //In case no errors until registering
+
+                //Set flush message about register complete at the session
+                putSessionScope(AttributeConst.FLUSH, MessageConst.I_REGISTERD.getMessage());
+
+                //Redirect to list screen
+                redirect(ForwardConst.ACT_REP, ForwardConst.CMD_INDEX);
+            }
+        }
+    }
+
 //    /**
 //     * Show detail screen
 //     * @throws ServletException
